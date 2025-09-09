@@ -13,17 +13,12 @@ import ru.ifmo.se.library.web.model.response.PageResponse;
 
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class ClientService {
     private final ClientRepository clientRepository;
     private final ClientMapper clientMapper;
-
-    public List<Client> findAll() {
-        return clientRepository.findAll();
-    }
 
     public PageResponse<Client> findAllWithPagination(Integer page, Integer size) {
         if (page == null || page < 0) page = 0;

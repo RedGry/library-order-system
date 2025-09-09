@@ -1,6 +1,8 @@
 package ru.ifmo.se.library.web.exception;
 
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,19 +16,20 @@ import ru.ifmo.se.library.util.ResponseUtils;
 import ru.ifmo.se.library.web.exception.model.ErrorResponse;
 
 import javax.persistence.EntityNotFoundException;
-import java.time.LocalDateTime;
 import java.util.Objects;
 
 @RestControllerAdvice
 @RequiredArgsConstructor
 public class GlobalExceptionHandler {
     private final ResponseUtils responseUtils;
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleEntityNotFoundException(
             EntityNotFoundException ex,
             WebRequest request
     ) {
+        logger.warn("Entity not found: {} - Path: {}", ex.getMessage(), request.getDescription(false));
         return responseUtils.buildErrorResponseWithMessage(
                 HttpStatus.NOT_FOUND,
                 ex.getMessage(),
@@ -39,6 +42,7 @@ public class GlobalExceptionHandler {
             MethodArgumentNotValidException ex,
             WebRequest request
     ) {
+        logger.error("HTTP message not readable: {} - Path: {}", ex.getMessage(), request.getDescription(false), ex);
         return responseUtils.buildErrorResponseWithMessage(
                 HttpStatus.BAD_REQUEST,
                 ex.getMessage(),
@@ -51,9 +55,12 @@ public class GlobalExceptionHandler {
             MethodArgumentNotValidException ex,
             WebRequest request
     ) {
+        String errorMessage = ex.getBindingResult().getAllErrors().get(0).getDefaultMessage();
+
+        logger.warn("Validation error: {} - Path: {}", errorMessage, request.getDescription(false));
         return responseUtils.buildErrorResponseWithMessage(
                 HttpStatus.BAD_REQUEST,
-                ex.getBindingResult().getAllErrors().get(0).getDefaultMessage(),
+                errorMessage,
                 request.getDescription(false)
         );
     }
@@ -67,6 +74,7 @@ public class GlobalExceptionHandler {
                 ex.getName(),
                 ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "unknown");
 
+        logger.warn("Method argument type mismatch: {} - Path: {}", message, request.getDescription(false));
         return responseUtils.buildErrorResponseWithMessage(
                 HttpStatus.BAD_REQUEST,
                 message,
@@ -84,6 +92,7 @@ public class GlobalExceptionHandler {
             message = "Duplicate entry or constraint violation";
         }
 
+        logger.error("Data integrity violation: {} - Path: {}", ex.getMessage(), request.getDescription(false), ex);
         return responseUtils.buildErrorResponseWithMessage(
                 HttpStatus.CONFLICT,
                 message,
@@ -93,6 +102,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex, WebRequest request) {
+        logger.warn("Illegal argument: {} - Path: {}", ex.getMessage(), request.getDescription(false));
         return responseUtils.buildErrorResponseWithMessage(
                 HttpStatus.BAD_REQUEST,
                 ex.getMessage(),
@@ -102,13 +112,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex, WebRequest request) {
-        ErrorResponse error = new ErrorResponse(
-                "Internal server error",
-                LocalDateTime.now().toString(),
+        logger.error("Unhandled exception: {} - Path: {}", ex.getMessage(), request.getDescription(false), ex);
+        return responseUtils.buildErrorResponseWithMessage(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                ex.getMessage(),
                 request.getDescription(false)
         );
-//        TODO: Убрать
-        ex.printStackTrace();
-        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
