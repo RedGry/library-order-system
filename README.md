@@ -21,11 +21,15 @@ DB_PASSWORD=testpassword
 
 Остальные параметры можно настроить в файлах: `src/main/resources/*`, либо их не трогать.
 
+Команда для запуска docker-compose: `docker-compose up`
+
 ## Сборка
 1. `mvn clean package`
 2. `java -jar target/library-0.0.1-SNAPSHOT.jar`
 
 Приложение поднимется на порту 8081 по умолчанию.
+
+Swagger: `http://{host}:8081/swagger-ui/index.html#/`
 
 ## Тесты
 `mvn test`
