@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.test.context.ActiveProfiles;
 import ru.ifmo.se.library.mapper.ClientMapper;
 import ru.ifmo.se.library.model.entity.Client;
 import ru.ifmo.se.library.repository.api.ClientRepository;
@@ -16,6 +17,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ActiveProfiles("test")
 class ClientServiceTest {
     @Mock
     private ClientRepository repository;

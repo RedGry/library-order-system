@@ -21,7 +21,8 @@ DB_PASSWORD=testpassword
 
 Остальные параметры можно настроить в файлах: `src/main/resources/*`, либо их не трогать.
 
-Команда для запуска docker-compose: `docker-compose up`
+Команда для запуска docker-compose с БД: `docker-compose up -d`.  
+P.S.: Проверьте, что у вас при запуске на занят порт `5432`, иначе БД не будет работать.
 
 ## Сборка
 1. `mvn clean package`

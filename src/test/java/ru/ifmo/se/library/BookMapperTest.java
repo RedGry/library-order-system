@@ -1,6 +1,7 @@
 package ru.ifmo.se.library;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ActiveProfiles;
 import ru.ifmo.se.library.mapper.BookMapper;
 import ru.ifmo.se.library.model.entity.Book;
 import ru.ifmo.se.library.web.model.request.BookRequest;
@@ -8,6 +9,7 @@ import ru.ifmo.se.library.web.model.request.BookUpdateRequest;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
+@ActiveProfiles("test")
 class BookMapperTest {
     private final BookMapper mapper = new BookMapper();
 
